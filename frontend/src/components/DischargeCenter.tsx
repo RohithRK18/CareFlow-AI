@@ -30,16 +30,16 @@ export const DischargeCenter: React.FC<DischargeCenterProps> = ({
   return (
     <div className="space-y-6">
       {/* 3-Column Discharge Center Top Banner */}
-      <div className="bg-[#091024] border border-slate-800 rounded-xl p-5 shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="neu-card p-6 shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded text-[10px] uppercase font-extrabold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+            <span className="px-3 py-1 rounded-full text-[10px] uppercase font-extrabold neu-inset text-cyan-300">
               DISCHARGE WORKFLOW WORKSPACE
             </span>
             <span className="text-xs text-slate-400 font-mono">Trace: DISCHARGE-2026-001928</span>
           </div>
-          <h2 className="text-xl font-extrabold text-slate-100 mt-1">Arjun Menon (58M) — UHID-BLR-2026-9921</h2>
-          <p className="text-xs text-slate-400">
+          <h2 className="text-xl font-extrabold text-slate-100 mt-2">Arjun Menon (58M) — UHID-BLR-2026-9921</h2>
+          <p className="text-xs text-slate-400 mt-1">
             Encounter: <span className="font-mono text-slate-200">ENC-BLR-2026-001928</span> | Department: Cardiology | Attending: Dr. Ananya Rao, MD
           </p>
         </div>
@@ -47,18 +47,18 @@ export const DischargeCenter: React.FC<DischargeCenterProps> = ({
         <div className="flex items-center gap-3">
           <button
             onClick={onStartDischarge}
-            className="flex items-center gap-2 bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs transition-all shadow-md shadow-cyan-500/20"
+            className="flex items-center gap-2 neu-button-cyan px-5 py-3 rounded-xl text-xs font-bold cursor-pointer"
           >
-            <Play className="h-3.5 w-3.5 fill-slate-950" />
+            <Play className="h-4 w-4 fill-slate-950" />
             <span>Re-Run AI Workflow Simulation</span>
           </button>
         </div>
       </div>
 
       {/* Immediate Question Answer Box (Requirement #38) */}
-      <div className="bg-amber-950/20 border border-amber-500/40 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="space-y-1 text-xs">
-          <div className="flex items-center gap-2 font-bold text-amber-300 uppercase tracking-wider text-[11px]">
+      <div className="neu-card border border-amber-500/30 p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="space-y-1.5 text-xs">
+          <div className="flex items-center gap-2 font-extrabold text-amber-300 uppercase tracking-wider text-[11px]">
             <AlertTriangle className="h-4 w-4" />
             Why is Arjun Menon's discharge requiring physician review?
           </div>
@@ -72,9 +72,9 @@ export const DischargeCenter: React.FC<DischargeCenterProps> = ({
 
         <button
           onClick={() => setShowExplainability(!showExplainability)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 rounded text-xs font-bold shrink-0"
+          className="flex items-center gap-1.5 px-4 py-2.5 neu-button text-amber-300 rounded-xl text-xs font-bold shrink-0"
         >
-          <HelpCircle className="h-3.5 w-3.5" />
+          <HelpCircle className="h-4 w-4" />
           <span>{showExplainability ? 'Hide AI Audit Evidence' : 'Why did AI recommend this?'}</span>
         </button>
       </div>
@@ -82,37 +82,37 @@ export const DischargeCenter: React.FC<DischargeCenterProps> = ({
       {/* 3-Column Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left 4 Cols: Vertical Agentic Process Workflow */}
-        <div className="lg:col-span-4 bg-[#091024] border border-slate-800 rounded-xl p-4 space-y-3">
+        <div className="lg:col-span-4 neu-card p-5 space-y-4">
           <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
             <span>Agentic Process Workflow</span>
-            <span className="text-[10px] text-cyan-400 font-mono">LangGraph</span>
+            <span className="text-[10px] text-cyan-400 font-mono neu-inset px-2 py-0.5">LangGraph</span>
           </h3>
 
-          <div className="space-y-2 relative">
+          <div className="space-y-2.5">
             {nodes.map((n) => {
               const isSelected = selectedNode === n.id;
-              let badgeStyle = 'bg-slate-800 text-slate-400 border-slate-700';
-              if (n.status === 'COMPLETED') badgeStyle = 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30';
-              if (n.status === 'WARNING') badgeStyle = 'bg-amber-500/20 text-amber-300 border-amber-500/40 animate-pulse';
-              if (n.status === 'AWAITING') badgeStyle = 'bg-purple-500/20 text-purple-300 border-purple-500/40';
+              let badgeStyle = 'neu-inset text-slate-400';
+              if (n.status === 'COMPLETED') badgeStyle = 'neu-inset text-emerald-400';
+              if (n.status === 'WARNING') badgeStyle = 'neu-inset text-amber-300 animate-pulse';
+              if (n.status === 'AWAITING') badgeStyle = 'neu-inset text-purple-300';
 
               return (
                 <div
                   key={n.id}
                   onClick={() => setSelectedNode(n.id)}
-                  className={`p-3 rounded-lg border text-xs cursor-pointer transition-all ${
+                  className={`p-3.5 rounded-xl text-xs cursor-pointer transition-all ${
                     isSelected
-                      ? 'bg-[#0E1733] border-cyan-500/60 shadow-md shadow-cyan-500/10'
-                      : 'bg-[#070D1E]/60 border-slate-800/80 hover:border-slate-700'
+                      ? 'neu-button-active border-l-4 border-cyan-400'
+                      : 'neu-card-hover'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-slate-200">{n.label}</span>
-                    <span className={`px-1.5 py-0.2 rounded text-[9px] font-bold border ${badgeStyle}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${badgeStyle}`}>
                       {n.status}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between mt-1 text-[10px] text-slate-500 font-mono">
+                  <div className="flex items-center justify-between mt-1.5 text-[10px] text-slate-400 font-mono">
                     <span>{n.agent}</span>
                     <span>{n.duration}</span>
                   </div>
@@ -125,8 +125,8 @@ export const DischargeCenter: React.FC<DischargeCenterProps> = ({
         {/* Center/Right 8 Cols: AI Discharge Document Viewer & Explainability Inspector */}
         <div className="lg:col-span-8 space-y-4">
           {showExplainability && (
-            <div className="bg-[#0E1733] border border-cyan-500/30 rounded-xl p-4 space-y-2 text-xs font-mono text-slate-300">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div className="neu-inset p-4 space-y-2 text-xs font-mono text-slate-300">
+              <div className="flex items-center justify-between border-b border-[#0d162a] pb-2">
                 <span className="font-bold text-cyan-400">AI EXPLAINABILITY & AUDIT TRAIL EVIDENCE</span>
                 <span className="text-[10px] text-emerald-400">Confidence: 94.2%</span>
               </div>
@@ -140,8 +140,8 @@ export const DischargeCenter: React.FC<DischargeCenterProps> = ({
           )}
 
           {/* Document Viewer */}
-          <div className="bg-[#091024] border border-slate-800 rounded-xl p-5 space-y-4 shadow-lg">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="neu-card p-6 space-y-4 shadow-lg">
+            <div className="flex items-center justify-between border-b border-[#0d162a] pb-3">
               <div>
                 <h4 className="text-sm font-bold text-slate-100 flex items-center gap-2">
                   <FileText className="h-4 w-4 text-cyan-400" />
@@ -151,18 +151,18 @@ export const DischargeCenter: React.FC<DischargeCenterProps> = ({
                   ★ AI GENERATED DRAFT • REQUIRES MANDATORY CLINICIAN REVIEW & SIGN-OFF
                 </div>
               </div>
-              <span className="text-[10px] text-slate-500 font-mono">Prompt v1.8-IN</span>
+              <span className="text-[10px] text-slate-500 font-mono neu-inset px-2 py-0.5">Prompt v1.8-IN</span>
             </div>
 
             <div className="space-y-4 text-xs text-slate-300 max-h-[420px] overflow-y-auto pr-2">
-              <div className="bg-slate-950/80 p-3.5 rounded-lg border border-slate-800">
+              <div className="neu-inset p-4 space-y-1">
                 <span className="font-bold text-slate-100 uppercase text-[11px] tracking-wide block mb-1">Clinical Hospitalization Course:</span>
                 <p className="leading-relaxed text-slate-300">
                   58-year-old male admitted with retrosternal chest pain. Coronary angiogram showed 90% stenosis in mid-LAD. Successful Percutaneous Transluminal Coronary Angioplasty (PTCA) with Drug-Eluting Stent (DES) to LAD performed on 08/21. Peak troponin I 4.8 ng/mL, trending down to 0.85 ng/mL. Hemodynamically stable, ambulating in ward.
                 </p>
               </div>
 
-              <div className="bg-slate-950/80 p-3.5 rounded-lg border border-slate-800">
+              <div className="neu-inset p-4 space-y-1">
                 <span className="font-bold text-slate-100 uppercase text-[11px] tracking-wide block mb-1">Outpatient Medications Regimen:</span>
                 <ul className="space-y-1 font-mono text-[11px] text-cyan-300">
                   <li>• Ecosprin (Aspirin) 75 mg PO Daily (Cardioprotection)</li>
@@ -173,24 +173,24 @@ export const DischargeCenter: React.FC<DischargeCenterProps> = ({
                 </ul>
               </div>
 
-              <div className="bg-rose-950/20 border border-rose-500/30 p-3.5 rounded-lg text-rose-300 text-[11px]">
+              <div className="neu-inset p-4 text-rose-300 text-[11px] border border-rose-500/20">
                 <span className="font-bold uppercase tracking-wide block mb-1">Warning Signs & Emergency Instructions:</span>
                 <div>• Contact CAREPLUS Emergency (+91 80 4910 2000) or report to ER immediately if experiencing severe chest tightness, shortness of breath, or bleeding from radial puncture site.</div>
               </div>
             </div>
 
             {/* Approval Action Button */}
-            <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
+            <div className="pt-4 border-t border-[#0d162a] flex items-center justify-between">
               <div className="text-xs text-slate-400">
                 Sign-off Status: <strong className="text-amber-300 font-mono">{workflowRun?.status || 'AWAITING_HUMAN_APPROVAL'}</strong>
               </div>
               <button
                 onClick={onApprove}
                 disabled={workflowRun?.status === 'APPROVED'}
-                className={`px-5 py-2.5 rounded-lg text-xs font-bold transition-all ${
+                className={`px-6 py-3 rounded-xl text-xs font-bold transition-all ${
                   workflowRun?.status === 'APPROVED'
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-mono'
-                    : 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 shadow-lg shadow-emerald-500/20 cursor-pointer'
+                    ? 'neu-inset text-emerald-400 font-mono'
+                    : 'neu-button-cyan cursor-pointer'
                 }`}
               >
                 {workflowRun?.status === 'APPROVED' ? '✓ DISCHARGE APPROVED BY DR. ANANYA RAO, MD' : 'Approve & Digital Sign-Off Discharge Package'}
