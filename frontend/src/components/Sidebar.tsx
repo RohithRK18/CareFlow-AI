@@ -15,7 +15,8 @@ import {
   Server,
   FileText,
   Network,
-  Building2
+  Building2,
+  Plus
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -78,25 +79,43 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Brand Header */}
       <div className="p-4 bg-[#0f172a] border-b border-slate-800/60 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          {/* Inflated Clay Medical AI Logo Mark */}
-          <div className="relative group cursor-pointer clay-button p-3 rounded-2xl flex items-center justify-center">
-            <Activity className="h-5 w-5 text-cyan-400 font-extrabold" />
-            <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-emerald-400 animate-ping" />
+          {/* 3D Medical Cross + Caring Swirl Icon Mark */}
+          <div className="relative group cursor-pointer shrink-0">
+            <div className="h-11 w-11 rounded-full bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 p-[2px] shadow-lg shadow-cyan-500/25 flex items-center justify-center">
+              <div className="h-full w-full bg-[#0b1329] rounded-full flex items-center justify-center relative overflow-hidden">
+                {/* 3D Glowing Gradient Swirl */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-purple-600/30 via-cyan-500/20 to-emerald-400/30" />
+                
+                {/* Embedded Medical Cross with Pulse Wave */}
+                <div className="relative flex items-center justify-center">
+                  <Plus className="h-6 w-6 text-cyan-400 font-black stroke-[3.5]" />
+                  <Activity className="h-4 w-4 text-emerald-300 absolute stroke-[3] animate-pulse" />
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Minimalistic Bold Typography */}
-          <div>
+          {/* Vibrant Gradient Brand Typography & Underline */}
+          <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
-              <h1 className="font-extrabold text-white text-base tracking-tight leading-none font-sans">
-                CARE<span className="text-cyan-400 font-black">Flow</span> <span className="text-teal-300 font-light text-sm">AI</span>
+              <h1 className="font-extrabold text-lg tracking-tight leading-none font-sans flex items-center">
+                <span className="text-white font-black">Care</span>
+                <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent font-black">Flow</span>
+                <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent font-black ml-0.5">AI</span>
               </h1>
-              <span className="text-[9px] font-bold px-2 py-0.5 clay-inset text-cyan-300 font-mono rounded-lg">
+              <span className="text-[9px] font-bold px-1.5 py-0.2 rounded clay-inset text-cyan-300 font-mono">
                 v2.0
               </span>
             </div>
-            <p className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase mt-1">
-              Care Orchestration
-            </p>
+            
+            {/* Custom Gradient Underline + Subtitle */}
+            <div className="flex items-center gap-1.5 mt-1">
+              <span className="h-[2px] w-5 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500" />
+              <span className="text-[9px] text-slate-300 font-extrabold tracking-widest uppercase">
+                CARE ORCHESTRATION
+              </span>
+              <span className="h-[2px] w-5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500" />
+            </div>
           </div>
         </div>
       </div>
