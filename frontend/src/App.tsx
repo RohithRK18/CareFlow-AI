@@ -11,50 +11,171 @@ import { Observability } from './components/Observability';
 import { MicroservicesControl } from './components/MicroservicesControl';
 import { ShieldAlert, CheckCircle2, History, FileCode2 } from 'lucide-react';
 
+const FALLBACK_PATIENTS = [
+  {
+    id: "CF-PT-10281",
+    uhid: "UHID-BLR-2026-9921",
+    name: "Arjun Menon",
+    age: 58,
+    gender: "Male",
+    admission_date: "2026-08-24",
+    attending_physician: "Dr. Ananya Rao, MD (Cardiology)",
+    department: "Cardiology",
+    ward_bed: "ICU-Bed-04",
+    tpa_status: "PRE_AUTH_APPROVED",
+    insurance_provider: "Star Health Premier",
+    readiness_score: "88%",
+    risk_level: "HIGH_RISK_MED_CONFLICT",
+    active_encounter: {
+      encounter_id: "ENC-BLR-2026-001928",
+      hospital_branch: "CAREPLUS Multispeciality Hospital — Koramangala, Bengaluru"
+    }
+  },
+  {
+    id: "CF-PT-10282",
+    uhid: "UHID-HYD-2026-4410",
+    name: "Sunita Sharma",
+    age: 64,
+    gender: "Female",
+    admission_date: "2026-08-25",
+    attending_physician: "Dr. Rajesh Kumar, MD (Pulmonology)",
+    department: "Pulmonology",
+    ward_bed: "Ward 3B - Bed 12",
+    tpa_status: "DOCUMENTS_SUBMITTED",
+    insurance_provider: "HDFC ERGO Health",
+    readiness_score: "94%",
+    risk_level: "LOW",
+    active_encounter: {
+      encounter_id: "ENC-HYD-2026-004410",
+      hospital_branch: "CAREPLUS Multispeciality Hospital — Gachibowli, Hyderabad"
+    }
+  }
+];
+
+const FALLBACK_SERVICES = [
+  { id: "patient-service", name: "Patient Service", port: 8001, status: "HEALTHY", requests_per_sec: 42, avg_latency_ms: 32, error_rate: "0.00%", dependencies: ["PostgreSQL EHR DB"], mcp_tools: ["get_patient"] },
+  { id: "clinical-service", name: "Clinical Summary Service", port: 8002, status: "HEALTHY", requests_per_sec: 38, avg_latency_ms: 68, error_rate: "0.01%", dependencies: ["Lab System"], mcp_tools: ["get_clinical_summary"] },
+  { id: "medication-service", name: "Medication Service", port: 8003, status: "HEALTHY", requests_per_sec: 55, avg_latency_ms: 94, error_rate: "0.00%", dependencies: ["Clinical Service"], mcp_tools: ["reconcile_medications"] },
+  { id: "discharge-service", name: "Discharge Planning Service", port: 8004, status: "HEALTHY", requests_per_sec: 24, avg_latency_ms: 110, error_rate: "0.00%", dependencies: ["Medication Service"], mcp_tools: ["calculate_readiness_score"] },
+  { id: "document-service", name: "Document Service", port: 8005, status: "HEALTHY", requests_per_sec: 19, avg_latency_ms: 280, error_rate: "0.02%", dependencies: ["Gemini 3.6 Flash"], mcp_tools: ["generate_discharge_document"] },
+  { id: "followup-service", name: "Follow-up Service", port: 8006, status: "HEALTHY", requests_per_sec: 31, avg_latency_ms: 48, error_rate: "0.00%", dependencies: ["Patient Service"], mcp_tools: ["create_followup_plan"] },
+  { id: "insurance-service", name: "Insurance / TPA Service", port: 8007, status: "HEALTHY", requests_per_sec: 29, avg_latency_ms: 140, error_rate: "0.03%", dependencies: ["Star Health API"], mcp_tools: ["check_insurance_tpa"] },
+  { id: "pharmacy-service", name: "Pharmacy Service", port: 8008, status: "HEALTHY", requests_per_sec: 48, avg_latency_ms: 52, error_rate: "0.00%", dependencies: ["Hospital ERP"], mcp_tools: ["check_pharmacy_stock"] },
+  { id: "notification-service", name: "Notification Service", port: 8009, status: "HEALTHY", requests_per_sec: 15, avg_latency_ms: 40, error_rate: "0.00%", dependencies: ["WhatsApp API"], mcp_tools: ["prepare_notification"] },
+  { id: "risk-service", name: "Risk & Safety Service", port: 8010, status: "HEALTHY", requests_per_sec: 62, avg_latency_ms: 115, error_rate: "0.00%", dependencies: ["Medication Service"], mcp_tools: ["run_safety_checks"] },
+  { id: "audit-service", name: "Audit & Telemetry Service", port: 8011, status: "HEALTHY", requests_per_sec: 120, avg_latency_ms: 18, error_rate: "0.00%", dependencies: ["ClickHouse Store"], mcp_tools: ["record_audit_event"] }
+];
+
+const FALLBACK_WORKFLOW_RUN = {
+  run_id: "RUN-SEED-IN-01",
+  trace_id: "DISCHARGE-2026-001928",
+  patient_id: "CF-PT-10281",
+  patient_name: "Arjun Menon",
+  uhid: "UHID-BLR-2026-9921",
+  encounter_id: "ENC-BLR-2026-001928",
+  start_time: "21:15:00",
+  status: "AWAITING_HUMAN_APPROVAL",
+  current_agent: "Physician Review Gate (Human-in-the-Loop)",
+  nodes_completed: ["PATIENT_CONTEXT", "CLINICAL_ANALYSIS", "MEDICATION_RECONCILIATION", "RISK_ASSESSMENT", "INSURANCE_PHARMACY", "FOLLOWUP_PLANNING", "DOCUMENT_GENERATION", "QA_VALIDATION"],
+  risk_findings: [
+    {
+      severity: "CRITICAL",
+      reason: "Prescription of Ibuprofen PRN alongside Dual Antiplatelet Therapy (Ecosprin + Brilinta) increases GI hemorrhage risk by 4x.",
+      evidence: "Active order: Ibuprofen 400 mg PRN",
+      policy: "MED-SAFETY-IN-003",
+      recommended_action: "Discontinue Ibuprofen PRN immediately; substitute Paracetamol 650mg PRN.",
+      status: "UNRESOLVED"
+    }
+  ],
+  approval_status: "PENDING_APPROVAL",
+  document: {
+    doc_id: "DOC-89A1F4C0",
+    patient_name: "Arjun Menon",
+    uhid: "UHID-BLR-2026-9921",
+    title: "CAREPLUS Multispeciality Hospital — Formal Discharge Summary & Instructions",
+    watermark: "AI GENERATED DRAFT • REQUIRES MANDATORY CLINICIAN REVIEW & SIGN-OFF",
+    created_at: "2026-08-28 21:18:42",
+    model: "gemini-3.6-flash",
+    prompt_version: "v1.8-IN",
+    trace_id: "DISCHARGE-2026-001928",
+    confidence_score: "94.2%",
+    rag_policy_sources: ["CAREPLUS Cardiology Protocol #DIS-042", "Drug Interaction Rules v3"],
+    sections: {
+      hospital_course: "Patient admitted post-PCI following NSTEMI. Stented with drug-eluting stent to LAD. Hemodynamically stable.",
+      discharge_diagnoses: ["Non-ST elevation myocardial infarction (NSTEMI)", "Coronary Artery Disease (CAD - 1VD post-PCI)"],
+      discharge_medications: [
+        "Ecosprin (Aspirin) 75 mg PO Daily (Cardioprotection / Post-PCI Stent Care)",
+        "Brilinta (Ticagrelor) 90 mg PO BID (Strict compliance required for 12 months)",
+        "Atorva (Atorvastatin) 80 mg PO Daily at bedtime",
+        "Metolar XR (Metoprolol) 25 mg PO Daily",
+        "Listril (Lisinopril) 10 mg PO Daily"
+      ],
+      patient_instructions: [
+        "Strictly avoid stopping antiplatelet drugs without cardiologist advice.",
+        "Keep radial puncture site clean and dry for 72 hours.",
+        "Avoid heavy lifting > 5 kg for 1 week.",
+        "Seek immediate emergency care if chest pain or shortness of breath recurs."
+      ],
+      warning_signs: [
+        "Retrosternal chest tightness or arm pain",
+        "Unusual bleeding, excessive bruising, or blood in stool",
+        "Dizziness, dyspnea, or sudden weakness"
+      ]
+    }
+  }
+};
+
 export function App() {
   const [currentTab, setCurrentTab] = useState<string>('dashboard');
   const [userRole, setUserRole] = useState<string>('Physician');
-  const [workflowRun, setWorkflowRun] = useState<any>(null);
+  const [workflowRun, setWorkflowRun] = useState<any>(FALLBACK_WORKFLOW_RUN);
   const [events, setEvents] = useState<any[]>([]);
-  const [patients, setPatients] = useState<any[]>([]);
+  const [patients, setPatients] = useState<any[]>(FALLBACK_PATIENTS);
   const [selectedPatientId, setSelectedPatientId] = useState<string>('CF-PT-10281');
-  const [servicesHealth, setServicesHealth] = useState<any[]>([]);
+  const [servicesHealth, setServicesHealth] = useState<any[]>(FALLBACK_SERVICES);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Fetch initial synthetic patients & microservice health
+  // Fetch initial synthetic patients & microservice health with safety checks
   useEffect(() => {
     fetch('/api/v1/patients')
-      .then((r) => r.json())
+      .then((r) => { if (!r.ok) throw new Error('API offline'); return r.json(); })
       .then((d) => setPatients(d))
-      .catch(() => {});
+      .catch(() => setPatients(FALLBACK_PATIENTS));
 
     fetch('/api/v1/services/health')
-      .then((r) => r.json())
-      .then((d) => setServicesHealth(d.services || []))
-      .catch(() => {});
+      .then((r) => { if (!r.ok) throw new Error('API offline'); return r.json(); })
+      .then((d) => setServicesHealth(d.services || FALLBACK_SERVICES))
+      .catch(() => setServicesHealth(FALLBACK_SERVICES));
 
     fetch('/api/v1/orchestrator/run/DISCHARGE-2026-001928')
-      .then((res) => res.json())
+      .then((res) => { if (!res.ok) throw new Error('API offline'); return res.json(); })
       .then((data) => setWorkflowRun(data))
-      .catch(() => {});
+      .catch(() => setWorkflowRun(FALLBACK_WORKFLOW_RUN));
   }, []);
 
-  // Connect WebSocket for live events
+  // Connect WebSocket with safety try/catch and protocol detection
   useEffect(() => {
-    const ws = new WebSocket(`ws://${window.location.host}/ws/events`);
-    ws.onmessage = (event) => {
-      try {
-        const parsed = JSON.parse(event.data);
-        setEvents((prev) => [parsed, ...prev.slice(0, 49)]);
-        if (parsed.trace_id) {
-          fetch(`/api/v1/orchestrator/run/${parsed.trace_id}`)
-            .then((r) => r.json())
-            .then((d) => setWorkflowRun(d))
-            .catch(() => {});
-        }
-      } catch (err) {}
-    };
-    return () => ws.close();
+    try {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const ws = new WebSocket(`${protocol}//${window.location.host}/ws/events`);
+      ws.onmessage = (event) => {
+        try {
+          const parsed = JSON.parse(event.data);
+          setEvents((prev) => [parsed, ...prev.slice(0, 49)]);
+          if (parsed.trace_id) {
+            fetch(`/api/v1/orchestrator/run/${parsed.trace_id}`)
+              .then((r) => { if (r.ok) return r.json(); })
+              .then((d) => d && setWorkflowRun(d))
+              .catch(() => {});
+          }
+        } catch (err) {}
+      };
+      return () => {
+        try { ws.close(); } catch (e) {}
+      };
+    } catch (err) {
+      console.warn("WebSocket omitted in static mode:", err);
+    }
   }, []);
 
   const handleStartDischarge = async (patientId: string = 'CF-PT-10281') => {
