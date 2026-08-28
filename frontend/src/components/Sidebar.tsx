@@ -75,16 +75,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside className="w-64 bg-[#0f172a] border-r border-slate-800/80 flex flex-col h-screen select-none shrink-0 z-20 shadow-[12px_0_24px_rgba(0,0,0,0.4)]">
-      {/* Brand Header */}
-      <div className="p-3 bg-[#0f172a] border-b border-slate-800/60 flex items-center justify-between">
-        <div className="flex items-center gap-2 cursor-pointer select-none">
-          {/* Generated High-Res 3D CareFlowAI Logo Asset */}
-          <div className="h-10 overflow-hidden rounded-xl clay-button p-1 flex items-center shrink-0">
+      {/* Brand Header with Claymorphism & Top-Left Logo Alignment */}
+      <div className="p-3.5 bg-[#0f172a] border-b border-slate-800/60 flex items-center justify-between">
+        <div className="flex items-center gap-3 cursor-pointer select-none">
+          {/* 3D Claymorphic Logo Container */}
+          <div className="h-11 w-11 rounded-2xl clay-button p-1 flex items-center justify-center shrink-0 shadow-lg shadow-cyan-950/40 border border-cyan-500/20">
             <img 
               src="/careflow_logo.jpg" 
               alt="CareFlowAI Logo" 
-              className="h-full w-auto object-cover rounded-lg"
+              className="h-full w-full object-cover rounded-xl"
             />
+          </div>
+          {/* Top-Left Brand Title & Subtitle */}
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm font-extrabold tracking-tight text-white drop-shadow-sm">
+                CareFlow<span className="text-cyan-400 font-black">AI</span>
+              </span>
+              <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full clay-badge-emerald tracking-wide">
+                v2.0
+              </span>
+            </div>
+            <span className="text-[10px] font-semibold text-slate-400 tracking-wider">
+              CAREPLUS HOSPITALS
+            </span>
           </div>
         </div>
       </div>
