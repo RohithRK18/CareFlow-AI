@@ -9,6 +9,11 @@ import { AgentCollaboration } from './components/AgentCollaboration';
 import { McpRegistry } from './components/McpRegistry';
 import { Observability } from './components/Observability';
 import { MicroservicesControl } from './components/MicroservicesControl';
+import { HospitalNetworkView } from './components/HospitalNetworkView';
+import { PatientSurveysView } from './components/PatientSurveysView';
+import { AiAgentMonitorView } from './components/AiAgentMonitorView';
+import { PatientPortalView } from './components/PatientPortalView';
+import { PostDischargeCareView } from './components/PostDischargeCareView';
 import { ShieldAlert, CheckCircle2, History, FileCode2 } from 'lucide-react';
 
 const FALLBACK_PATIENTS = [
@@ -127,7 +132,8 @@ const FALLBACK_WORKFLOW_RUN = {
 
 export function App() {
   const [currentTab, setCurrentTab] = useState<string>('dashboard');
-  const [userRole, setUserRole] = useState<string>('Physician');
+  const [selectedHospitalId, setSelectedHospitalId] = useState<string>('blr-central');
+  const [selectedRoleId, setSelectedRoleId] = useState<string>('role-ananya');
   const [workflowRun, setWorkflowRun] = useState<any>(FALLBACK_WORKFLOW_RUN);
   const [events, setEvents] = useState<any[]>([]);
   const [patients, setPatients] = useState<any[]>(FALLBACK_PATIENTS);
@@ -206,27 +212,60 @@ export function App() {
   const selectedPatient = patients.find((p) => p.id === selectedPatientId) || patients[0];
 
   return (
-    <div className="flex h-screen bg-[#070D1E] text-slate-100 font-sans overflow-hidden">
+    <div className="flex h-screen bg-[#f4f6f8] text-slate-800 font-sans overflow-hidden">
       {/* Left Application Shell Sidebar */}
       <Sidebar
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
-        userRole={userRole}
-        setUserRole={setUserRole}
+        selectedRoleId={selectedRoleId}
+        setSelectedRoleId={setSelectedRoleId}
       />
 
       {/* Main Workspace */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto bg-[#070D1E]">
-        <Header onSearchQuery={(q) => setSearchQuery(q)} />
+      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto bg-[#f4f6f8]">
+        <Header
+          onSearchQuery={(q) => setSearchQuery(q)}
+          selectedHospitalId={selectedHospitalId}
+          setSelectedHospitalId={setSelectedHospitalId}
+          selectedRoleId={selectedRoleId}
+        />
         {searchQuery && <div className="hidden">{searchQuery}</div>}
 
         {/* Dynamic Route Workspace */}
-        <div className="p-6">
+        <div className="p-6 max-w-[1600px] w-full mx-auto space-y-6">
           {(currentTab === 'dashboard' || currentTab === 'live-ops') && (
             <Dashboard
               onStartSampleDischarge={() => handleStartDischarge('CF-PT-10281')}
               onNavigate={(tab) => setCurrentTab(tab)}
+              selectedHospitalId={selectedHospitalId}
+              setSelectedHospitalId={setSelectedHospitalId}
+              selectedRoleId={selectedRoleId}
+              setSelectedRoleId={setSelectedRoleId}
             />
+          )}
+
+          {currentTab === 'patient-portal' && (
+            <PatientPortalView />
+          )}
+
+          {currentTab === 'post-discharge' && (
+            <PostDischargeCareView />
+          )}
+
+          {currentTab === 'agent-ops' && (
+            <AiAgentMonitorView />
+          )}
+
+          {currentTab === 'hospital-network' && (
+            <HospitalNetworkView
+              selectedHospitalId={selectedHospitalId}
+              setSelectedHospitalId={setSelectedHospitalId}
+              onNavigate={(tab) => setCurrentTab(tab)}
+            />
+          )}
+
+          {currentTab === 'patient-surveys' && (
+            <PatientSurveysView />
           )}
 
           {currentTab === 'discharge' && (
@@ -274,12 +313,12 @@ export function App() {
 
           {currentTab === 'approvals' && (
             <div className="space-y-6">
-              <div className="bg-[#091024] border border-slate-800 rounded-xl p-5">
-                <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+              <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-emerald-600" />
                   PHYSICIAN APPROVAL QUEUE (HUMAN-IN-THE-LOOP)
                 </h2>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-slate-500 mt-1">
                   CAREPLUS AI generates draft discharge packages & safety recommendations. Mandatory attending physician review & digital sign-off is required.
                 </p>
               </div>
@@ -294,29 +333,29 @@ export function App() {
 
           {currentTab === 'safety' && (
             <div className="space-y-6">
-              <div className="bg-[#091024] border border-slate-800 rounded-xl p-5">
-                <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                  <ShieldAlert className="h-5 w-5 text-rose-400" />
+              <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                  <ShieldAlert className="h-5 w-5 text-rose-600" />
                   CAREPLUS AI SAFETY & CLINICAL GUARDRAILS CENTER
                 </h2>
-                <p className="text-xs text-slate-400 mt-1">Active guardrail alerts, contraindication checks, and risk blocker evaluations.</p>
+                <p className="text-xs text-slate-500 mt-1">Active guardrail alerts, contraindication checks, and risk blocker evaluations.</p>
               </div>
 
-              <div className="bg-[#091024] border border-amber-500/40 rounded-xl p-5 space-y-3">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                  <span className="text-xs font-bold text-amber-300">CRITICAL SAFETY ALERT #ALT-992</span>
-                  <span className="px-2 py-0.5 bg-rose-500/20 text-rose-400 rounded text-[10px] font-bold border border-rose-500/30">
+              <div className="bg-white border border-amber-300 rounded-xl p-5 space-y-3 shadow-sm">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span className="text-xs font-bold text-amber-900 font-mono">CRITICAL SAFETY ALERT #ALT-992</span>
+                  <span className="px-2.5 py-0.5 bg-rose-100 text-rose-800 rounded text-[10px] font-bold border border-rose-200 font-mono">
                     UNRESOLVED CLINICAL RISK
                   </span>
                 </div>
-                <div className="text-xs text-slate-100 font-bold">
+                <div className="text-xs text-slate-900 font-bold">
                   Patient: Arjun Menon (UHID-BLR-2026-9921)
                 </div>
-                <p className="text-xs text-slate-300">
+                <p className="text-xs text-slate-700">
                   Potential contraindication: Prescription of Ibuprofen PRN alongside Dual Antiplatelet Therapy (Ecosprin + Brilinta). NSAID administration increases severe GI hemorrhage risk by 4x.
                 </p>
                 <div className="pt-2 flex gap-3">
-                  <button onClick={() => setCurrentTab('approvals')} className="px-3 py-1.5 bg-amber-500 text-slate-950 rounded text-xs font-bold shadow-md">
+                  <button onClick={() => setCurrentTab('approvals')} className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold shadow-md">
                     Review in Approval Queue
                   </button>
                 </div>
@@ -326,17 +365,17 @@ export function App() {
 
           {currentTab === 'audit' && (
             <div className="space-y-6">
-              <div className="bg-[#091024] border border-slate-800 rounded-xl p-5">
-                <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                  <History className="h-5 w-5 text-cyan-400" />
+              <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                  <History className="h-5 w-5 text-[#0284c7]" />
                   IMMUTABLE AUDIT TRAIL LOGS
                 </h2>
-                <p className="text-xs text-slate-400 mt-1">Complete audit records tracking user, agent, service, tool, and approval actions.</p>
+                <p className="text-xs text-slate-500 mt-1">Complete audit records tracking user, agent, service, tool, and approval actions.</p>
               </div>
 
-              <div className="bg-[#091024] border border-slate-800 rounded-xl p-5 overflow-x-auto">
-                <table className="w-full text-left text-xs text-slate-300 font-mono">
-                  <thead className="bg-[#070D1E] text-slate-400 uppercase text-[10px]">
+              <div className="bg-white border border-slate-200 rounded-xl p-5 overflow-x-auto shadow-sm">
+                <table className="w-full text-left text-xs text-slate-700 font-mono">
+                  <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] border-b border-slate-200">
                     <tr>
                       <th className="py-2.5 px-3">Timestamp</th>
                       <th className="py-2.5 px-3">User / Actor</th>
@@ -346,22 +385,22 @@ export function App() {
                       <th className="py-2.5 px-3">Result</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800">
-                    <tr className="hover:bg-[#0E1733]">
-                      <td className="py-2.5 px-3 text-slate-400">2026-08-28 21:19:03</td>
-                      <td className="py-2.5 px-3 text-slate-100 font-bold">Dr. Ananya Rao, MD</td>
-                      <td className="py-2.5 px-3 text-cyan-400">Physician Sign-Off Gate</td>
+                  <tbody className="divide-y divide-slate-100">
+                    <tr className="hover:bg-slate-50">
+                      <td className="py-2.5 px-3 text-slate-500">2026-08-28 21:19:03</td>
+                      <td className="py-2.5 px-3 text-slate-900 font-bold">Dr. Ananya Rao, MD</td>
+                      <td className="py-2.5 px-3 text-[#0284c7]">Physician Sign-Off Gate</td>
                       <td className="py-2.5 px-3">CLINICIAN_APPROVE</td>
-                      <td className="py-2.5 px-3 text-slate-400">DISCHARGE-2026-001928</td>
-                      <td className="py-2.5 px-3 text-emerald-400 font-bold">SUCCESS</td>
+                      <td className="py-2.5 px-3 text-slate-500">DISCHARGE-2026-001928</td>
+                      <td className="py-2.5 px-3 text-emerald-700 font-bold">SUCCESS</td>
                     </tr>
-                    <tr className="hover:bg-[#0E1733]">
-                      <td className="py-2.5 px-3 text-slate-400">2026-08-28 21:18:42</td>
+                    <tr className="hover:bg-slate-50">
+                      <td className="py-2.5 px-3 text-slate-500">2026-08-28 21:18:42</td>
                       <td className="py-2.5 px-3">DISCHARGE_ORCHESTRATOR</td>
-                      <td className="py-2.5 px-3 text-purple-400">Medication Agent</td>
+                      <td className="py-2.5 px-3 text-purple-700">Medication Agent</td>
                       <td className="py-2.5 px-3">check_medication_conflicts</td>
-                      <td className="py-2.5 px-3 text-slate-400">DISCHARGE-2026-001928</td>
-                      <td className="py-2.5 px-3 text-emerald-400 font-bold">SUCCESS</td>
+                      <td className="py-2.5 px-3 text-slate-500">DISCHARGE-2026-001928</td>
+                      <td className="py-2.5 px-3 text-emerald-700 font-bold">SUCCESS</td>
                     </tr>
                   </tbody>
                 </table>
@@ -371,17 +410,17 @@ export function App() {
 
           {(currentTab === 'prompts' || currentTab === 'rag-knowledge' || currentTab === 'config') && (
             <div className="space-y-6">
-              <div className="bg-[#091024] border border-slate-800 rounded-xl p-5">
-                <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                  <FileCode2 className="h-5 w-5 text-cyan-400" />
+              <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                  <FileCode2 className="h-5 w-5 text-[#0284c7]" />
                   CAREPLUS AI PLATFORM CONFIGURATION & PROMPT REGISTRY
                 </h2>
-                <p className="text-xs text-slate-400 mt-1">Prompt versioning (v1.8-IN), FAISS index settings, and guardrail policies.</p>
+                <p className="text-xs text-slate-500 mt-1">Prompt versioning (v1.8-IN), FAISS index settings, and guardrail policies.</p>
               </div>
 
-              <div className="bg-[#091024] border border-slate-800 rounded-xl p-5 space-y-4">
-                <h3 className="text-sm font-bold text-cyan-400 font-mono">DISCHARGE_SUMMARY_PROMPT (v1.8-IN)</h3>
-                <pre className="bg-slate-950 p-4 rounded text-xs font-mono text-slate-300 border border-slate-800 leading-relaxed">
+              <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-sm">
+                <h3 className="text-sm font-bold text-[#0284c7] font-mono">DISCHARGE_SUMMARY_PROMPT (v1.8-IN)</h3>
+                <pre className="bg-slate-900 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 leading-relaxed overflow-x-auto">
 {`You are the Discharge Document Agent for CAREPLUS MULTISPECIALITY HOSPITALS.
 Generate a structured, clinical-grade discharge summary draft for patient {patient_name} ({uhid}).
 
