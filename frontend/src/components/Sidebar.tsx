@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Activity,
   LayoutDashboard,
@@ -15,7 +15,9 @@ import {
   Sparkles,
   User,
   Heart,
-  Calendar
+  Calendar,
+  Menu,
+  X
 } from 'lucide-react';
 import { DEMO_ROLES } from '../data/demoData';
 
@@ -32,6 +34,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   selectedRoleId,
   setSelectedRoleId
 }) => {
+  const [mobileOpen, setMobileOpen] = useState(false);
   const currentRole = DEMO_ROLES.find(r => r.id === selectedRoleId) || DEMO_ROLES[0];
 
   const sections = [
@@ -42,6 +45,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         { id: 'patient-portal', label: 'Patient Portal', icon: User },
         { id: 'discharge', label: 'Discharge Workspace', icon: FileText },
         { id: 'patients', label: 'Patient Directory & EHR', icon: Users },
+        { id: 'discharge-summary-report', label: 'Overall Discharge Reports', icon: FileText },
       ]
     },
     {
@@ -78,30 +82,48 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   ];
 
-  return (
-    <aside className="w-64 md:w-72 bg-white border-r border-slate-200/80 flex flex-col h-screen select-none shrink-0 z-20 shadow-md font-sans">
-      {/* 1. Dedicated Premium Rectangular Brand Header Panel (125-145px height) */}
-      <div className="p-3.5 bg-gradient-to-b from-slate-50 to-white border-b border-slate-200/80 flex flex-col items-center justify-center text-center shrink-0 min-h-[135px]">
-        {/* White Clay Logo Card */}
-        <div className="w-[88%] bg-white p-2.5 rounded-xl shadow-[3px_3px_10px_rgba(180,192,206,0.25),-3px_-3px_10px_rgba(255,255,255,0.9)] border border-slate-100 flex items-center justify-center mb-1.5">
-          <img 
-            src="/careflow_logo.jpg" 
-            alt="CareFlowAI Logo" 
-            className="h-10 w-auto max-w-[140px] object-contain transition-transform duration-200 hover:scale-105"
-          />
+  const handleTabClick = (tabId: string) => {
+    setCurrentTab(tabId);
+    setMobileOpen(false);
+  };
+
+  const sidebarContent = (
+    <>
+      {/* 1. Concise Brand Header Panel */}
+      <div className="px-4 py-3 bg-gradient-to-r from-slate-50 via-white to-sky-50/40 border-b border-slate-200/80 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-3 min-w-0">
+          {/* Logo Card */}
+          <div className="bg-white p-2 rounded-xl shadow-[2px_2px_8px_rgba(180,192,206,0.25)] border border-slate-100 flex items-center justify-center shrink-0">
+            <img
+              src="/clinova_logo.png"
+              alt="Clinova Logo"
+              className="h-12 w-auto max-w-[70px] object-contain transition-transform duration-200 hover:scale-105"
+            />
+          </div>
+
+          {/* Name & Description */}
+          <div className="flex flex-col text-left min-w-0">
+            <span className="text-lg font-black font-[900] tracking-wider text-[#0f172a] font-romanica uppercase leading-none">
+              Clinova
+            </span>
+            <span className="text-[8.5px] font-bold text-slate-500 tracking-wider uppercase mt-0.5 leading-tight">
+              CARE ORCHESTRATION PLATFORM
+            </span>
+          </div>
         </div>
-        <div className="flex flex-col items-center">
-          <span className="text-sm font-black tracking-tight text-[#0f172a] font-sans uppercase flex items-center gap-0.5">
-            CareFlow<span className="text-[#0284c7]">AI</span>
-          </span>
-          <span className="text-[9px] font-semibold text-slate-500 tracking-widest uppercase mt-0.5">
-            CARE ORCHESTRATION PLATFORM
-          </span>
-        </div>
+
+        {/* Mobile Close Button */}
+        <button
+          onClick={() => setMobileOpen(false)}
+          className="md:hidden p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100"
+          aria-label="Close menu"
+        >
+          <X className="h-5 w-5" />
+        </button>
       </div>
 
-      {/* 2. Multi-Role Switcher (Section #2 & #3) */}
-      <div className="px-3.5 py-3 bg-[#eef3f7]/70 border-b border-slate-200/80 shadow-inner">
+      {/* 2. Multi-Role Switcher */}
+      <div className="px-3.5 py-3 bg-[#eef3f7]/70 border-b border-slate-200/80 shadow-inner shrink-0">
         <div className="flex items-center justify-between mb-1.5">
           <span className="text-[9.5px] font-extrabold text-slate-500 uppercase tracking-widest flex items-center gap-1">
             <User className="h-3 w-3 text-[#0284c7]" /> ACTIVE ROLE
@@ -112,11 +134,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </span>
         </div>
 
-        {/* Categorized Multi-Role Selector */}
         <div className="relative">
           <select
             value={selectedRoleId}
-            onChange={(e) => setSelectedRoleId(e.target.value)}
+            onChange={(e) => {
+              setSelectedRoleId(e.target.value);
+              setMobileOpen(false);
+            }}
             className="w-full bg-white text-xs text-slate-800 px-3 py-2 focus:outline-none font-bold border border-slate-300 rounded-xl cursor-pointer shadow-sm hover:border-sky-500 transition-colors"
           >
             <optgroup label="Clinical Team">
@@ -176,12 +200,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
               return (
                 <button
                   key={item.id}
-                  onClick={() => setCurrentTab(item.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-all duration-150 ${
-                    isActive
+                  onClick={() => handleTabClick(item.id)}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-all duration-150 ${isActive
                       ? 'bg-gradient-to-r from-sky-50 to-white text-[#0369a1] font-bold border-l-4 border-[#0284c7] shadow-[2px_2px_8px_rgba(180,192,206,0.2)]'
                       : 'text-slate-600 font-semibold hover:text-slate-900 hover:bg-slate-100/70'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-2.5">
                     <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[#0284c7]' : 'text-slate-400'}`} />
@@ -211,6 +234,43 @@ export const Sidebar: React.FC<SidebarProps> = ({
           DEMO ENVIRONMENT • SIMULATED DATA • NOT FOR CLINICAL USE
         </div>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile Top Navigation Header */}
+      <div className="md:hidden bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between z-30 sticky top-0 shadow-sm shrink-0">
+        <div className="flex items-center gap-2.5">
+          <div className="bg-white p-1.5 rounded-lg shadow-sm border border-slate-200">
+            <img src="/clinova_logo.png" alt="Clinova" className="h-9 w-auto max-w-[52px] object-contain" />
+          </div>
+          <span className="text-base font-black font-romanica uppercase text-slate-900">Clinova</span>
+        </div>
+        <button
+          onClick={() => setMobileOpen(!mobileOpen)}
+          className="p-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors flex items-center gap-1 text-xs font-bold"
+        >
+          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          <span className="text-[11px]">MENU</span>
+        </button>
+      </div>
+
+      {/* Mobile Backdrop & Drawer */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      <aside className={`
+        fixed inset-y-0 left-0 z-50 w-72 bg-white flex flex-col h-full shadow-2xl transition-transform duration-300 ease-in-out md:static md:translate-x-0 md:h-screen md:w-64 lg:w-72 md:shadow-md md:z-20 border-r border-slate-200/80 select-none shrink-0 font-sans
+        ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+      `}>
+        {sidebarContent}
+      </aside>
+    </>
   );
 };
+

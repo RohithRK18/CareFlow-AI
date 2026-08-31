@@ -22,9 +22,10 @@ export const DischargeCenter: React.FC<DischargeCenterProps> = ({
 }) => {
   const [selectedLang, setSelectedLang] = useState<string>('English');
   const [nutritionApproved, setNutritionApproved] = useState<boolean>(false);
+  const [localApproved, setLocalApproved] = useState<boolean>(workflowRun?.approval_status === 'APPROVED');
 
   const doc = workflowRun?.document;
-  const isApproved = workflowRun?.approval_status === 'APPROVED';
+  const isApproved = localApproved || workflowRun?.approval_status === 'APPROVED';
 
   return (
     <div className="space-y-6 font-sans">
@@ -238,14 +239,17 @@ export const DischargeCenter: React.FC<DischargeCenterProps> = ({
             </p>
 
             {isApproved ? (
-              <div className="bg-emerald-50 text-emerald-800 p-3 rounded-xl border border-emerald-300 font-bold text-xs text-center flex items-center justify-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                DISCHARGE AUTHORIZED & SIGNED
+              <div className="bg-emerald-50 text-emerald-800 p-3.5 rounded-xl border border-emerald-300 font-extrabold text-xs text-center flex items-center justify-center gap-2 shadow-sm animate-in fade-in zoom-in-95">
+                <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
+                <span>DISCHARGE AUTHORIZED & SIGNED</span>
               </div>
             ) : (
               <button
-                onClick={onApprove}
-                className="w-full clay-button-primary py-3 rounded-xl font-black text-xs shadow-md transition-all flex items-center justify-center gap-2"
+                onClick={() => {
+                  setLocalApproved(true);
+                  if (onApprove) onApprove();
+                }}
+                className="w-full clay-button-primary py-3 rounded-xl font-black text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer hover:brightness-105 active:scale-95"
               >
                 <CheckCircle2 className="h-4 w-4" />
                 <span>APPROVE DISCHARGE & SIGN</span>

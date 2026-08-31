@@ -8,7 +8,9 @@ import {
   Apple,
   Languages,
   ShieldCheck,
-  Stethoscope
+  Stethoscope,
+  CheckCircle2,
+  Check
 } from 'lucide-react';
 import { type PatientDetailed } from '../data/demoData';
 
@@ -26,6 +28,7 @@ export const Patient360View: React.FC<Patient360ViewProps> = ({
   const [activeTab, setActiveTab] = useState<'overview' | 'clinical' | 'medications' | 'labs' | 'diet' | 'education' | 'timeline'>('overview');
   const [selectedLang, setSelectedLang] = useState<string>(patient.education_language || 'English');
   const [dietApproved, setDietApproved] = useState<boolean>(false);
+  const [approvalStatus, setApprovalStatus] = useState<string>(patient.physician_approval_status || 'Pending Approval');
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 md:p-6 font-sans">
@@ -91,9 +94,26 @@ export const Patient360View: React.FC<Patient360ViewProps> = ({
             </span>
             <span className="flex items-center gap-1.5">
               Physician Approval:
-              <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold">
-                {patient.physician_approval_status}
-              </span>
+              {approvalStatus === 'Approved' ? (
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 font-extrabold flex items-center gap-1">
+                  <CheckCircle2 className="h-3 w-3 text-emerald-600" /> Approved
+                </span>
+              ) : (
+                <div className="flex items-center gap-1.5">
+                  <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold">
+                    {approvalStatus}
+                  </span>
+                  <button
+                    onClick={() => {
+                      setApprovalStatus('Approved');
+                      patient.physician_approval_status = 'Approved';
+                    }}
+                    className="px-2.5 py-0.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] shadow-sm transition-all flex items-center gap-1 cursor-pointer"
+                  >
+                    <Check className="h-3 w-3" /> Approve Now
+                  </button>
+                </div>
+              )}
             </span>
           </div>
 

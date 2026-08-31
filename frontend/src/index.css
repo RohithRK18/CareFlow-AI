@@ -8,6 +8,10 @@
   }
 }
 
+.font-romanica {
+  font-family: 'Cinzel', 'Marcellus', 'Trajan Pro', Georgia, serif;
+}
+
 /* Warm Light Claymorphism Design Tokens */
 .clay-card-warm {
   background: #ffffff;
@@ -87,4 +91,70 @@
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/* Responsive Global Media Queries & Fluid Adaptability */
+@media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden;
+  }
+  
+  .clay-card-warm {
+    border-radius: 0.875rem;
+    padding: 1rem !important;
+  }
+  
+  .clay-card-secondary {
+    border-radius: 0.75rem;
+    padding: 0.875rem !important;
+  }
+
+  /* Prevent table cutoffs on mobile devices */
+  table {
+    min-width: 550px;
+  }
+}
+
+@media (max-width: 480px) {
+  .clay-card-warm {
+    padding: 0.75rem !important;
+  }
+  
+  input, select, button {
+    max-width: 100%;
+  }
+}
+
+/* Clean Print Styling (Removes browser localhost:3000 headers/footers & watermarks) */
+@media print {
+  @page {
+    margin: 8mm 12mm;
+    size: A4 portrait;
+  }
+  
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print, header, nav, button, select, input {
+    display: none !important;
+  }
+
+  /* Hide fixed overlay backdrop styling when printing */
+  .pdf-modal-backdrop {
+    position: static !important;
+    background: white !important;
+    padding: 0 !important;
+    backdrop-filter: none !important;
+  }
+
+  .pdf-modal-card {
+    max-width: 100% !important;
+    max-height: none !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
 }

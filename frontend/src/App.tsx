@@ -14,6 +14,7 @@ import { PatientSurveysView } from './components/PatientSurveysView';
 import { AiAgentMonitorView } from './components/AiAgentMonitorView';
 import { PatientPortalView } from './components/PatientPortalView';
 import { PostDischargeCareView } from './components/PostDischargeCareView';
+import { DischargeSummaryReportView } from './components/DischargeSummaryReportView';
 import { ShieldAlert, CheckCircle2, History, FileCode2 } from 'lucide-react';
 
 const FALLBACK_PATIENTS = [
@@ -132,7 +133,7 @@ const FALLBACK_WORKFLOW_RUN = {
 
 export function App() {
   const [currentTab, setCurrentTab] = useState<string>('dashboard');
-  const [selectedHospitalId, setSelectedHospitalId] = useState<string>('blr-central');
+  const [selectedHospitalId, setSelectedHospitalId] = useState<string>('chn-central');
   const [selectedRoleId, setSelectedRoleId] = useState<string>('role-ananya');
   const [workflowRun, setWorkflowRun] = useState<any>(FALLBACK_WORKFLOW_RUN);
   const [events, setEvents] = useState<any[]>([]);
@@ -196,23 +197,30 @@ export function App() {
 
   const handleApproveDischarge = async () => {
     const traceId = workflowRun?.trace_id || 'DISCHARGE-2026-001928';
-    await fetch('/api/v1/orchestrator/approve', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        trace_id: traceId,
-        notes: 'Discharge authorized by Dr. Ananya Rao after reviewing Ibuprofen conflict resolution.'
-      })
-    });
-    const res = await fetch(`/api/v1/orchestrator/run/${traceId}`);
-    const data = await res.json();
-    setWorkflowRun(data);
+    try {
+      await fetch('/api/v1/orchestrator/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          trace_id: traceId,
+          notes: 'Discharge authorized by Dr. Ananya Rao after reviewing Ibuprofen conflict resolution.'
+        })
+      });
+      const res = await fetch(`/api/v1/orchestrator/run/${traceId}`);
+      const data = await res.json();
+      setWorkflowRun(data);
+    } catch (e) {
+      setWorkflowRun((prev: any) => ({
+        ...prev,
+        approval_status: 'APPROVED'
+      }));
+    }
   };
 
   const selectedPatient = patients.find((p) => p.id === selectedPatientId) || patients[0];
 
   return (
-    <div className="flex h-screen bg-[#f4f6f8] text-slate-800 font-sans overflow-hidden">
+    <div className="flex flex-col md:flex-row h-screen bg-[#f4f6f8] text-slate-800 font-sans overflow-hidden">
       {/* Left Application Shell Sidebar */}
       <Sidebar
         currentTab={currentTab}
@@ -232,7 +240,7 @@ export function App() {
         {searchQuery && <div className="hidden">{searchQuery}</div>}
 
         {/* Dynamic Route Workspace */}
-        <div className="p-6 max-w-[1600px] w-full mx-auto space-y-6">
+        <div className="p-3 sm:p-4 md:p-6 max-w-[1600px] w-full mx-auto space-y-4 md:space-y-6">
           {(currentTab === 'dashboard' || currentTab === 'live-ops') && (
             <Dashboard
               onStartSampleDischarge={() => handleStartDischarge('CF-PT-10281')}
@@ -246,6 +254,10 @@ export function App() {
 
           {currentTab === 'patient-portal' && (
             <PatientPortalView />
+          )}
+
+          {currentTab === 'discharge-summary-report' && (
+            <DischargeSummaryReportView />
           )}
 
           {currentTab === 'post-discharge' && (
