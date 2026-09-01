@@ -27,10 +27,16 @@ export interface PatientDetailed {
   name: string;
   age: number;
   gender: string;
+  city?: string;
+  district?: string;
+  abha_id?: string;
+  emergency_contact?: string;
   admission_date: string;
+  discharge_date?: string;
   expected_discharge_date: string;
   length_of_stay: string;
   attending_physician: string;
+  doctor_reg?: string;
   doctorId: string;
   department: string;
   specialty: string;
@@ -40,19 +46,33 @@ export interface PatientDetailed {
   tpa_status: string;
   insurance_provider: string;
   readiness_score: string;
-  risk_level: 'LOW' | 'MODERATE' | 'HIGH_RISK_MED_CONFLICT' | 'CRITICAL';
+  risk_level: 'LOW' | 'MODERATE' | 'HIGH' | 'HIGH_RISK_MED_CONFLICT' | 'CRITICAL';
   clinical_stability: 'Stable' | 'Guarded' | 'Critical';
   med_rec_status: 'Completed' | 'Attention Required' | 'Pending';
   physician_approval_status: 'Approved' | 'Pending Approval' | 'Revision Requested';
+  primary_diagnosis?: string;
+  icd10?: string;
   diagnoses: { code: string; name: string }[];
   comorbidities: string[];
   allergies: string[];
   vitals: { hr: string; bp: string; spo2: string; temp: string; rr: string };
-  labs: { test: string; result: string; unit: string; status: 'Normal' | 'Abnormal' }[];
+  labs: { test: string; result: string; unit: string; reference?: string; flag?: string; status: 'Normal' | 'Abnormal' | 'Critical' }[];
+  imaging?: { type: string; impression: string; doctor: string; date: string }[];
   current_medications: { name: string; dose: string; frequency: string; route: string; purpose: string }[];
   medication_changes: { name: string; change: 'Added' | 'Discontinued' | 'Dose Adjusted'; reason: string }[];
   procedures: string[];
   timeline: { time: string; event: string; actor: string; type: 'clinical' | 'agent' | 'vitals' | 'risk' }[];
+  discharge_summary?: {
+    hospital: string;
+    doctor: string;
+    reg_no?: string;
+    diagnosis: string;
+    course: string;
+    diet_instructions: string;
+    activity_instructions: string;
+    warning_signs: string;
+    followup_date: string;
+  };
   fppd_plan: {
     food_nutrition: string;
     physical_activity: string;
@@ -431,7 +451,119 @@ export const DEMO_AI_AGENTS: AiAgentStatus[] = [
   }
 ];
 
-// 4. DEMO PATIENTS DETAILED (10 Mock Patients with Full Diet, Medicines & Follow-ups)
+// Generator for 110+ synthetic Tamil Nadu patients
+const TN_CITIES_LIST = ["Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem", "Tirunelveli", "Erode", "Vellore", "Thanjavur", "Dindigul", "Thoothukudi", "Sivakasi", "Nagercoil", "Karur", "Namakkal"];
+const TN_MALE_NAMES = ["Karthik", "Murugan", "Santhosh", "Saravanan", "Srinivasan", "Vijay", "Venkatesh", "Sundar", "Ganesh", "Balaji", "Ramesh", "Dhanush", "Kannan", "Mani", "Selvam", "Anand", "Ramanathan", "Prabhu", "Elango", "Aravind", "Ashok", "Gopinath", "Dinesh", "Senthil", "Velu", "Logesh", "Naveen", "Vasanth", "Jayakumar", "Rajesh", "Prakash"];
+const TN_FEMALE_NAMES = ["Kavitha", "Lakshmi", "Meenakshi", "Gayathri", "Radhika", "Priya", "Anitha", "Suganya", "Divya", "Sangeetha", "Revathi", "Sowmya", "Abirami", "Deepa", "Vidhya", "Bhuvaneshwari", "Nithya", "Hemalatha", "Uma", "Kanchana", "Preetha", "Soundarya", "Malathi", "Indira", "Subhashini", "Shalini", "Menaka", "Thamarai", "Poornima"];
+const TN_SURNAMES = ["Subramanian", "Krishnan", "Raman", "Natarajan", "Sundaram", "Venkataraman", "Iyengar", "Iyer", "Chettiar", "Mudaliar", "Gounder", "Naicker", "Pillai", "Thevar", "Srinivasan", "Rajagopal", "Pandian", "Sethupathi", "Kannan", "Muthusamy", "Swaminathan", "Chakravarthy"];
+const TN_HOSPITAL_UNITS = [
+  { id: "chn-central", name: "CAREPLUS Chennai Central" },
+  { id: "chn-omr", name: "CAREPLUS Chennai OMR" },
+  { id: "cbe-main", name: "CAREPLUS Coimbatore" },
+  { id: "mdu-main", name: "CAREPLUS Madurai" },
+  { id: "trz-main", name: "CAREPLUS Trichy" },
+  { id: "slm-main", name: "CAREPLUS Salem" },
+  { id: "tni-main", name: "CAREPLUS Tirunelveli" },
+  { id: "vlr-main", name: "CAREPLUS Vellore" }
+];
+
+const generateTNPatientList = (): PatientDetailed[] => {
+  const list: PatientDetailed[] = [];
+  for (let i = 1; i <= 105; i++) {
+    const isMale = i % 2 === 0;
+    const fn = isMale ? TN_MALE_NAMES[i % TN_MALE_NAMES.length] : TN_FEMALE_NAMES[i % TN_FEMALE_NAMES.length];
+    const ln = TN_SURNAMES[i % TN_SURNAMES.length];
+    const name = `${fn} ${ln}`;
+    const city = TN_CITIES_LIST[i % TN_CITIES_LIST.length];
+    const hosp = TN_HOSPITAL_UNITS[i % TN_HOSPITAL_UNITS.length];
+    const readinessVal = 65 + (i * 7) % 33;
+    const ptId = `CF-PT-${20000 + i}`;
+    
+    list.push({
+      id: ptId,
+      uhid: `UHID-TN-2026-${1000 + i}`,
+      mrn: `MRN-TN-${30000 + i}`,
+      name: name,
+      age: 24 + (i * 3) % 55,
+      gender: isMale ? "Male" : "Female",
+      admission_date: `2026-08-${(1 + (i % 20)).toString().padStart(2, '0')}`,
+      expected_discharge_date: `2026-08-${(5 + (i % 20)).toString().padStart(2, '0')}`,
+      length_of_stay: `${3 + (i % 4)} Days`,
+      attending_physician: `Dr. ${TN_MALE_NAMES[(i * 3) % TN_MALE_NAMES.length]} ${TN_SURNAMES[(i * 2) % TN_SURNAMES.length]}, MD`,
+      doctorId: `role-${(i % 4) + 1}`,
+      department: i % 5 === 0 ? "Cardiology" : i % 5 === 1 ? "Neurology" : i % 5 === 2 ? "General Medicine" : i % 5 === 3 ? "Orthopedics" : "Gastroenterology",
+      specialty: i % 5 === 0 ? "Cardiology" : i % 5 === 1 ? "Neurology" : i % 5 === 2 ? "General Medicine" : i % 5 === 3 ? "Orthopedics" : "Gastroenterology",
+      ward_bed: `Ward-${(i % 8) + 1} Bed-${(i % 20) + 1}`,
+      hospital_id: hosp.id,
+      hospital_name: hosp.name,
+      tpa_status: readinessVal > 85 ? "PRE_AUTH_APPROVED" : "DOCUMENTS_SUBMITTED",
+      insurance_provider: i % 3 === 0 ? "Star Health Premier" : i % 3 === 1 ? "TNCMCHS Scheme" : "HDFC ERGO Health",
+      readiness_score: `${readinessVal}%`,
+      risk_level: readinessVal < 75 ? "HIGH" : readinessVal < 88 ? "MODERATE" : "LOW",
+      clinical_stability: readinessVal > 75 ? "Stable" : "Guarded",
+      med_rec_status: readinessVal > 80 ? "Completed" : "Attention Required",
+      physician_approval_status: readinessVal > 85 ? "Approved" : "Pending Approval",
+      diagnoses: [
+        { code: "E11.9", name: "Type 2 Diabetes Mellitus" },
+        { code: "I10", name: "Essential Hypertension" }
+      ],
+      comorbidities: ["Hypertension", "Dyslipidemia"],
+      allergies: i % 4 === 0 ? ["Penicillin (Urticaria)"] : [],
+      vitals: { hr: "76 bpm", bp: "124/80 mmHg", spo2: "98%", temp: "98.6 °F", rr: "16/min" },
+      labs: [
+        { test: "Hemoglobin", result: "13.2", unit: "g/dL", status: "Normal" },
+        { test: "Serum Creatinine", result: "0.9", unit: "mg/dL", status: "Normal" },
+        { test: "HbA1c", result: "6.9", unit: "%", status: "Abnormal" }
+      ],
+      current_medications: [
+        { name: "Metformin", dose: "500 mg", frequency: "Twice daily", route: "PO", purpose: "Glycemic control" },
+        { name: "Telmisartan", dose: "40 mg", frequency: "Once daily morning", route: "PO", purpose: "Blood pressure control" }
+      ],
+      medication_changes: [
+        { name: "Pantoprazole 40mg", change: "Added", reason: "Gastric prophylaxis" }
+      ],
+      procedures: ["Inpatient evaluation and clinical stabilization"],
+      timeline: [
+        { time: "09:00", event: `Morning clinical rounds in ${city}`, actor: "Attending Doctor", type: "clinical" }
+      ],
+      fppd_plan: {
+        food_nutrition: "Balanced South Indian low-sodium diabetic diet",
+        physical_activity: "30 minutes gentle morning walking daily",
+        precautions: "Monitor blood pressure and blood sugar weekly",
+        daily_schedule: "Morning: Walk & breakfast meds. Night: Dinner meds.",
+        followup_timeline: "OPD Review in 7 days",
+        symptom_monitoring: "Report fever, dizziness, or chest discomfort immediately",
+        review_status: "VERIFIED BY CLINICIAN"
+      },
+      post_discharge_journey: [
+        { day: "Day 0", milestone: "Discharge & Handover", status: "Completed", description: "Discharge summary & e-prescription handed over." },
+        { day: "Day 7", milestone: "OPD Follow-up", status: "Upcoming", description: "Consultation at hospital OPD." }
+      ],
+      indian_diet_plan: {
+        cuisine: "Tamil Nadu Traditional",
+        breakfast: ["2 Steamed Idlis with Sambar", "1 cup warm Ragi Malt"],
+        lunch: ["1 cup Brown Ponni Rice", "Spinach Kootu & Vegetable Poriyal", "Curd"],
+        snack: ["Boiled Sundal", "Green Tea"],
+        dinner: ["2 Wheat Roti", "Mixed Vegetable Curry"],
+        limit_avoid: ["Deep fried foods", "Pickles & papad", "Sugary items"],
+        sodium_limit: "< 2.0g per day",
+        fluid_restriction: "Normal (2.0L / day)",
+        review_status: "Approved by Dietitian"
+      },
+      education_language: "Tamil & English",
+      education_content: {
+        "Tamil": {
+          instructions: ["மருந்துகளை தினமும் குறித்த நேரத்தில் சாப்பிடவும்.", "நடைபயிற்சி 30 நிமிடங்கள் செய்யவும்."],
+          warning_signs: ["கடும் தலைவலி அல்லது மயக்கம் வந்தால் உடனடியாக மருத்துவமனை வரவும்."],
+          emergency_contact: "+91 800-419-9999"
+        }
+      }
+    });
+  }
+  return list;
+};
+
+// 4. DEMO PATIENTS DETAILED (110+ Patients with Full Data)
 export const DEMO_PATIENTS_DETAILED: PatientDetailed[] = [
   {
     id: "CF-PT-10281",
@@ -1230,7 +1362,8 @@ export const DEMO_PATIENTS_DETAILED: PatientDetailed[] = [
         emergency_contact: "CAREPLUS Rheumatology Helpline: +91 800-419-0000"
       }
     }
-  }
+  },
+  ...generateTNPatientList()
 ];
 
 // 5. REGIONAL METRICS & SURVEY DATA (Section #30)

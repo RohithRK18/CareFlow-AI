@@ -18,14 +18,114 @@ export const McpRegistry: React.FC = () => {
       schema: { patient_id: "string" }
     },
     {
-      name: "get_clinical_summary",
+      name: "get_patient_vitals",
+      server: "PatientService",
+      access: "Clinical Agent, Nursing Agent",
+      perm: "READ",
+      status: "ACTIVE",
+      calls: 124,
+      latency: "32ms",
+      schema: { patient_id: "string" }
+    },
+    {
+      name: "get_lab_results",
       server: "ClinicalSummaryService",
-      access: "Clinical Agent, Risk Agent",
+      access: "Lab Agent, Clinical Agent",
       perm: "READ",
       status: "ACTIVE",
       calls: 118,
-      latency: "82ms",
+      latency: "68ms",
+      schema: { patient_id: "string", limit: "number" }
+    },
+    {
+      name: "get_medications",
+      server: "MedicationService",
+      access: "Medication Agent, Pharmacy Agent",
+      perm: "READ",
+      status: "ACTIVE",
+      calls: 156,
+      latency: "52ms",
       schema: { patient_id: "string" }
+    },
+    {
+      name: "get_discharge_summary",
+      server: "DocumentService",
+      access: "Document Agent, Care Transition Agent",
+      perm: "READ",
+      status: "ACTIVE",
+      calls: 98,
+      latency: "110ms",
+      schema: { patient_id: "string" }
+    },
+    {
+      name: "get_followup",
+      server: "FollowupService",
+      access: "Follow-up Agent",
+      perm: "READ",
+      status: "ACTIVE",
+      calls: 84,
+      latency: "40ms",
+      schema: { patient_id: "string" }
+    },
+    {
+      name: "get_documents",
+      server: "DocumentService",
+      access: "Document Agent",
+      perm: "READ",
+      status: "ACTIVE",
+      calls: 72,
+      latency: "85ms",
+      schema: { patient_id: "string" }
+    },
+    {
+      name: "create_prescription",
+      server: "MedicationService",
+      access: "Clinical Agent, Pharmacy Agent",
+      perm: "WRITE",
+      status: "ACTIVE",
+      calls: 64,
+      latency: "140ms",
+      schema: { patient_id: "string", medications: "array" }
+    },
+    {
+      name: "generate_discharge_summary",
+      server: "DocumentService",
+      access: "Document Agent",
+      perm: "WRITE",
+      status: "ACTIVE",
+      calls: 76,
+      latency: "280ms",
+      schema: { patient_id: "string", trace_id: "string" }
+    },
+    {
+      name: "schedule_followup",
+      server: "FollowupService",
+      access: "Follow-up Agent",
+      perm: "WRITE",
+      status: "ACTIVE",
+      calls: 58,
+      latency: "92ms",
+      schema: { patient_id: "string", doctor_id: "string", date: "string" }
+    },
+    {
+      name: "send_patient_notification",
+      server: "NotificationService",
+      access: "Care Transition Agent",
+      perm: "EXECUTE",
+      status: "ACTIVE",
+      calls: 112,
+      latency: "45ms",
+      schema: { patient_id: "string", channel: "string", message: "string" }
+    },
+    {
+      name: "generate_patient_education",
+      server: "PatientEducationAgent",
+      access: "Patient Education Agent",
+      perm: "WRITE",
+      status: "ACTIVE",
+      calls: 89,
+      latency: "190ms",
+      schema: { patient_id: "string", language: "string" }
     },
     {
       name: "check_medication_conflicts",
@@ -35,36 +135,6 @@ export const McpRegistry: React.FC = () => {
       status: "ACTIVE",
       calls: 95,
       latency: "120ms",
-      schema: { patient_id: "string" }
-    },
-    {
-      name: "check_insurance",
-      server: "InsuranceService",
-      access: "Insurance Agent",
-      perm: "READ",
-      status: "ACTIVE",
-      calls: 88,
-      latency: "94ms",
-      schema: { patient_id: "string" }
-    },
-    {
-      name: "generate_discharge_document",
-      server: "DocumentService",
-      access: "Document Agent",
-      perm: "WRITE",
-      status: "ACTIVE",
-      calls: 76,
-      latency: "310ms",
-      schema: { patient_id: "string", trace_id: "string" }
-    },
-    {
-      name: "run_safety_check",
-      server: "RiskSafetyService",
-      access: "Risk Agent, QA Agent",
-      perm: "READ_EXECUTE",
-      status: "ACTIVE",
-      calls: 110,
-      latency: "150ms",
       schema: { patient_id: "string" }
     }
   ];

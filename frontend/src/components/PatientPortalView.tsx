@@ -20,7 +20,9 @@ import { DEMO_PATIENTS_DETAILED, DEMO_ASK_CAREFLOWAI_QA, type PatientDetailed } 
 export const PatientPortalView: React.FC = () => {
   const [patientsList, setPatientsList] = useState<PatientDetailed[]>(DEMO_PATIENTS_DETAILED);
   const [selectedPatientId, setSelectedPatientId] = useState<string>(DEMO_PATIENTS_DETAILED[0].id);
-  const [activeTab, setActiveTab] = useState<'overview' | 'medicines' | 'food' | 'fppd' | 'followup' | 'warnings'>('overview');
+  const [activeTab, setActiveTab] = useState<
+    'overview' | 'medicines' | 'tests' | 'reports' | 'prescriptions' | 'discharge-summary' | 'food' | 'fppd' | 'followup' | 'warnings' | 'assistant' | 'documents' | 'access-history'
+  >('overview');
   
   const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'assistant'; text: string }[]>([
     { role: 'assistant', text: "Hello! I'm CareFlowAI, your post-discharge care assistant. How can I help you understand your care plan today?" }

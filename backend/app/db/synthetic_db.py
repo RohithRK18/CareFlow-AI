@@ -5,6 +5,7 @@ Provides realistic clinical data for Indian patients across encounters, diagnose
 
 from typing import Dict, List, Any
 from datetime import datetime
+from app.db.synthetic_tn_data import SYNTHETIC_TN_PATIENTS
 
 SYNTHETIC_PATIENTS: List[Dict[str, Any]] = [
     {
@@ -32,7 +33,8 @@ SYNTHETIC_PATIENTS: List[Dict[str, Any]] = [
             "attending_physician": "Dr. Ananya Rao, MD, DM (Cardiology)",
             "reason_for_admission": "Acute Coronary Syndrome, Non-ST Elevation Myocardial Infarction (NSTEMI)"
         }
-    },
+    }
+] + SYNTHETIC_TN_PATIENTS + [
     {
         "id": "CF-PT-10492",
         "name": "Priya Sharma",

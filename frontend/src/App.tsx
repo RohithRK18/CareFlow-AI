@@ -15,6 +15,10 @@ import { AiAgentMonitorView } from './components/AiAgentMonitorView';
 import { PatientPortalView } from './components/PatientPortalView';
 import { PostDischargeCareView } from './components/PostDischargeCareView';
 import { DischargeSummaryReportView } from './components/DischargeSummaryReportView';
+import { DischargeSummaryGenerator } from './components/DischargeSummaryGenerator';
+import { PrescriptionGenerator } from './components/PrescriptionGenerator';
+import { ConsentManagementView } from './components/ConsentManagementView';
+import { DataManagementControl } from './components/DataManagementControl';
 import { ShieldAlert, CheckCircle2, History, FileCode2 } from 'lucide-react';
 
 const FALLBACK_PATIENTS = [
@@ -254,6 +258,22 @@ export function App() {
 
           {currentTab === 'patient-portal' && (
             <PatientPortalView />
+          )}
+
+          {currentTab === 'discharge-summary-generator' && (
+            <DischargeSummaryGenerator selectedPatient={selectedPatient} />
+          )}
+
+          {currentTab === 'prescription-generator' && (
+            <PrescriptionGenerator selectedPatient={selectedPatient} />
+          )}
+
+          {currentTab === 'consent-management' && (
+            <ConsentManagementView patient={selectedPatient} />
+          )}
+
+          {currentTab === 'data-management' && (
+            <DataManagementControl />
           )}
 
           {currentTab === 'discharge-summary-report' && (

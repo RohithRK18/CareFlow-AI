@@ -16,6 +16,7 @@ import {
   User,
   Heart,
   Calendar,
+  Pill,
   Menu,
   X
 } from 'lucide-react';
@@ -44,6 +45,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         { id: 'dashboard', label: 'Overview', icon: LayoutDashboard },
         { id: 'patient-portal', label: 'Patient Portal', icon: User },
         { id: 'discharge', label: 'Discharge Workspace', icon: FileText },
+        { id: 'discharge-summary-generator', label: 'Discharge Generator', icon: FileText },
+        { id: 'prescription-generator', label: 'Prescription Generator', icon: Pill },
         { id: 'patients', label: 'Patient Directory & EHR', icon: Users },
         { id: 'discharge-summary-report', label: 'Overall Discharge Reports', icon: FileText },
       ]
@@ -75,6 +78,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     {
       title: "GOVERNANCE",
       items: [
+        { id: 'consent-management', label: 'Consent Management', icon: CheckCircle2 },
+        { id: 'data-management', label: 'Synthetic Data Control', icon: Server },
         { id: 'approvals', label: 'Approval Queue', icon: CheckCircle2 },
         { id: 'safety', label: 'Safety & Guardrails', icon: ShieldAlert },
         { id: 'audit', label: 'Audit Trail & Compliance', icon: History },
